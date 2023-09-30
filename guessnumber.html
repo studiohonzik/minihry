@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+      #scoreboard {
+    position:absolute; 
+    top:10px; 
+    right:10px; 
+    border-radius:15px; /* Increase the border radius here */
+    padding:10px; 
+    background-color:#f8f8f8; 
+    border:1px solid #ddd;
+  }
+    @font-face {
+            font-family: "Exo 2";
+            src: url("Exo2-VariableFont_wght.ttf");
+        }
+    body, input, button, select { /* Přidání stylu Exo 2 na textové pole, tlačítko a rolovací menu */
+      font-family: "Exo 2";
+    }
+    body {
+      animation: pulse 15s infinite;
+    }
+    button {
+      border: none;
+      color: black;
+      padding: 10px 20px; /* Menší velikost tlačítka */
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px; /* Menší velikost písma */
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 12px;
+      transition-duration: 0.4s;
+      height: 40px; /* Stejná výška jako textové pole */
+    }
+
+    button:hover {
+      background-color: darkslateblue;
+      color: white;
+    }
+
+    /* Styly pro textové pole */
+    input[type="text"] {
+        width: 200px; /* Širší textové pole */
+        padding: 12px 20px; /* Větší textové pole */
+        margin-top: 8px; /* Menší mezera mezi nadpisem a textovým polem */
+        box-sizing: border-box;
+        border-radius: 4px; /* Zaoblené rohy */
+        font-size: 16px; /* Větší písmo */
+        height: 40px; /* Stejná výška jako tlačítko */
+    }
+
+    /* Styly pro rolovací menu a nápis obtížnosti */
+    #difficulty, #difficulty-label {
+        position: fixed; /* Fixovaná pozice */
+        right: 20px; /* Odsazení od pravého okraje */
+        bottom: 20px; /* Odsazení od dolního okraje */
+    }
+
+    /* Styly pro scoreboard */
+    #scoreboard {
+        position: fixed; /* Fixovaná pozice */
+        right: 20px; /* Odsazení od pravého okraje */
+        top: 20px; /* Odsazení od horního okraje */
+        font-size: larger; /* Větší písmo */
+        width: fit-content; /* Šířka podle obsahu */
+    }
+
+    @keyframes pulse {
+    0% {
+      background-color: white;
+    }
+    50% {
+      background-color: #3ead85;
+    }
+    100% {
+      background-color: white;
+    }
+  }
+  </style>
+    <title>Hádej číslo</title>
+    <script type="text/javascript">
+        let maxNumber = 100; // Maximální číslo pro danou obtížnost
+        let secretNumber = Math.floor(Math.random() * maxNumber) + 1;
+        let attempts = 0;
+
+        // Načtení skóre z cookies
+        let totalAttempts = parseInt(getCookie('totalAttempts')) || 0;
+        let gamesWon = parseInt(getCookie('gamesWon')) || 0;
+
+        function guessNumber() {
+            let userGuess = parseInt(document.getElementById('guess').value);
+            attempts++;
+
+            if (isNaN(userGuess) || userGuess < 1 || userGuess > maxNumber) {
+                document.getElementById('result').innerHTML = "<span style='color:#FF0000;'>To nevypadá jako platné číslo! Zkus to znovu! 🔁</span>";
+            } else if (userGuess < secretNumber) {
+                document.getElementById('result').innerHTML = "<span style='color:#FFA500;'>Tvůj tip je příliš <strong>nízký</strong>! Zkus to znovu! 🔁</span>";
+            } else if (userGuess > secretNumber) {
+                document.getElementById('result').innerHTML = "<span style='color:#FFA500;'>Tvůj tip je příliš <strong>vysoký</strong>! Zkus to znovu! 🔁</span>";
+            } else if (userGuess === secretNumber) {
+                document.getElementById('result').innerHTML = "<span style='color:#008000;'><strong>GG, uhodl jsi číslo v " + attempts + " pokusech! 🎉</strong></span>";
+                gamesWon++;
+                totalAttempts += attempts;
+                setCookie('totalAttempts', totalAttempts, 30);
+                setCookie('gamesWon', gamesWon, 30);
+                updateScoreboard();
+            }
+    updateScoreboard();
+
+            // Vymaže obsah textového pole
+            document.getElementById('guess').value = '';
+        }
+
+        // Funkce pro detekci stisknutí klávesy Enter
+        function checkForEnter(event) {
+            if (event.keyCode === 13) {
+                guessNumber();
+            }
+        }
+
+        // Funkce pro změnu obtížnosti
+        function changeDifficulty() {
+            let difficulty = document.getElementById('difficulty').value;
+
+            switch(difficulty) {
+                case 'Velmi Lehká (1 - 25)':
+                    maxNumber = 25;
+                    break;
+                case 'Lehká (1 - 100)':
+                    maxNumber = 100;
+                    break;
+                case 'Střední (1 - 1000)':
+                    maxNumber = 1000;
+                    break;
+                case 'Těžká (1 - 10000)':
+                    maxNumber = 10000;
+                    break;
+                case 'Velmi Těžká (1 - 100000)':
+                    maxNumber = 100000;
+                    break;
+                case 'Extrémně Těžká (1 - 1000000)':
+                    maxNumber = 1000000;
+                    break;
+                default:
+                    maxNumber = 100; // Default je Střední obtížnost
+            }
+
+            secretNumber = Math.floor(Math.random() * maxNumber) + 1; // Vygeneruje nové tajné číslo v novém rozsahu
+            attempts = 0; // Resetuje počet pokusů
+            document.getElementById('result').textContent = ''; // Vymaže výsledek
+        }
+
+        // Funkce pro nastavení cookie
+        function setCookie(cname, cvalue, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays*24*60*60*1000));
+            var expires = "expires="+ d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+
+        // Funkce pro načtení cookie
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for(var i = 0; i <ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        // Funkce pro aktualizaci scoreboardu
+        function updateScoreboard() {
+            let averageAttempts = (totalAttempts / gamesWon).toFixed(2);
+            document.getElementById('averageAttempts').textContent = averageAttempts;
+            document.getElementById('currentAttempts').textContent = attempts;
+        }
+    </script>
+</head>
+<body>
+    <h1>Hádej číslo!</h1>
+  <a href="index.html" style="position:absolute; bottom:10px; left:10px;">Hlavní strana</a>
+    <input type="text" id="guess" placeholder="Zadej svůj tip" onkeydown="checkForEnter(event)">
+    <button onclick="guessNumber()">Hrát</button>
+    <p id="result"></p>
+    <div id="scoreboard">
+      <h2>Skóre 📊</h2>
+      <hr/>
+      Průměrně uhodnuto v: <span id="averageAttempts"></span> pokusech
+      <hr/>
+      Toto kolo pokusů: <span id="currentAttempts"></span>
+    </div>
+    <p id="difficulty-label">Obtížnost:</p>
+    <select id="difficulty" onchange="changeDifficulty()">
+        <option>Velmi Lehká (1 - 25)</option>
+        <option selected>Lehká (1 - 100)</option>
+        <option>Střední (1 - 1000)</option>
+        <option>Těžká (1 - 10000)</option>
+        <option>Velmi těžká (1 - 100000)</option>
+        <option>Extrémně Těžká (1 - 1000000)</option>
+      
+    </select>
+</body>
+</html>

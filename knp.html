@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<style>
+  @font-face {
+    font-family: "Exo 2";
+    src: url("Exo2-VariableFont_wght.ttf");
+  }
+
+  body {
+    font-family: "Exo 2";
+    animation: pulse 15s infinite;
+  }
+
+  .button {
+    background-color: white;
+    color: black;
+    padding: 5px; /* Adjust the height of the button here */
+    margin-right: 10px;
+    border-radius: 5px;
+    box-shadow: none; /* Remove the black border */
+    transition-duration: 0.4s;
+    width: 60px; /* Adjust the width of the button here */
+    cursor: pointer; /* Change the cursor to a pointer when hovering over the button */
+  }
+
+  .resetButton {
+    background-color: white;
+    color: black;
+    padding: 5px; /* Adjust the height of the button here */
+    margin-right: 10px;
+    border-radius: 5px;
+    box-shadow: none; /* Remove the black border */
+    transition-duration: 0.4s;
+    width: 80px; /* Adjust the width of the button here */
+    cursor: pointer; /* Change the cursor to a pointer when hovering over the button */
+  }
+
+  .button:hover, .resetButton:hover {
+    background-color: darkslateblue;
+    color: white;
+  }
+
+  @keyframes pulse {
+    0% {
+      background-color: white;
+    }
+    50% {
+      background-color: #3ead85;
+    }
+    100% {
+      background-color: white;
+    }
+  }
+
+  #scoreboard {
+    position:absolute; 
+    top:10px; 
+    right:10px; 
+    border-radius:15px; /* Increase the border radius here */
+    padding:10px; 
+    background-color:#f8f8f8; 
+    border:1px solid #ddd;
+  }
+
+</style>
+<head>
+  <title>Kámen, nůžky, papír</title>
+</head>
+<body>
+<audio id="winSound" src="win.mp3" preload="auto"></audio>
+<audio id="drawSound" src="draw.mp3" preload="auto"></audio>
+<audio id="loseSound" src="lose.mp3" preload="auto"></audio>
+<audio id="resetSound" src="reset.mp3" preload="auto"></audio>
+
+<h1>Kámen, nůžky, papír</h1>
+
+<button class="button" onclick="hraj('kámen')" title="Kámen">🪨</button>
+<button class="button" onclick="hraj('nůžky')" title="Nůžky">✂️</button>
+<button class="button" onclick="hraj('papír')" title="Papír">📑</button>
+
+<p id="vysledek"></p>
+
+<a href="index.html" style="position:absolute; bottom:10px; right:10px;">Hlavní strana</a>
+
+<div id="scoreboard">
+<h2>Skóre 📊</h2>
+<hr/>
+<p>Výhry 🏆: <span id="wins">0</span></p>
+<p>Remízy 😐: <span id="draws">0</span></p>
+<p>Prohry ☄️: <span id="losses">0</span></p>
+<hr/>
+<p>Celkové skóre 🎉: <span id="total">0</span></p>
+<hr/>
+<p>Celkový počet tahů 🔄: <span id="totalMoves">0</span></p>
+<button class="resetButton" onclick="confirmReset()" title="Vyresetovat všechny hodnoty na 0">🔁 Resetovat skóre</button>
+</div>
+
+<script>
+var wins = parseInt(localStorage.getItem('wins')) || 0,
+draws = parseInt(localStorage.getItem('draws')) || 0,
+losses = parseInt(localStorage.getItem('losses')) || 0,
+totalMoves = parseInt(localStorage.getItem('totalMoves')) || 0;
+
+function playSound(soundId) {
+var sound = document.getElementById(soundId);
+sound.play();
+}
+
+function hraj(hrac) {
+var moznosti = ['kámen', 'nůžky', 'papír'];
+var pocitac = moznosti[Math.floor(Math.random() * moznosti.length)];
+
+totalMoves++;
+localStorage.setItem('totalMoves', totalMoves);
+
+if (hrac === pocitac) {
+document.getElementById("vysledek").style.color = "yellow";
+document.getElementById("vysledek").textContent = "Remíza!";
+draws++;
+localStorage.setItem('draws', draws);
+playSound('drawSound');
+} else if ((hrac === 'kámen' && pocitac === 'nůžky') || (hrac === 'nůžky' && pocitac === 'papír') || (hrac === 'papír' && pocitac === 'kámen')) {
+document.getElementById("vysledek").style.color = "green";
+document.getElementById("vysledek").textContent = "GG, vyhrál jsi 🎉!";
+wins++;
+localStorage.setItem('wins', wins);
+playSound('winSound');
+} else {
+document.getElementById("vysledek").style.color = "red";
+document.getElementById("vysledek").textContent = "Bohužel, bot vyhrál ☄️.";
+losses++;
+localStorage.setItem('losses', losses);
+playSound('loseSound');
+}
+
+// Update the scoreboard
+updateScoreboard();
+}
+
+function updateScoreboard() {
+document.getElementById("wins").textContent = wins;
+document.getElementById("draws").textContent = draws;
+document.getElementById("losses").textContent = losses;
+document.getElementById("total").textContent = wins - losses;
+document.getElementById("totalMoves").textContent = totalMoves;
+}
+
+function resetScore() {
+wins = 0;
+draws = 0;
+losses = 0;
+totalMoves = 0;
+localStorage.setItem('wins', wins);
+localStorage.setItem('draws', draws);
+localStorage.setItem('losses', losses);
+localStorage.setItem('totalMoves', totalMoves);
+updateScoreboard();
+alert("Skóre resetováno!");
+playSound('resetSound');
+}
+
+function confirmReset() {
+if (confirm("Opravdu chcete resetovat skóre?")) {
+resetScore();
+}
+}
+
+// Update the scoreboard when the page loads
+updateScoreboard();
+</script>
+
+</body>
+</html>

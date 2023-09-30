@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #noButton, #yesButton {
+            position: relative;
+            transition: 0.5s;
+            padding: 8.5px;
+            margin-right: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0,0,0,.3);
+            cursor: pointer;
+        }
+        #noButton {
+            background-color: white;
+            color: black;
+        }
+        #yesButton {
+            background-color: lightgreen;
+            color: black;
+        }
+        #noButton:hover {
+            background-color: lightblue;
+            color: white;
+        }
+        #yesButton:hover {
+            background-color: green;
+            color: white;
+        }
+        @font-face {
+            font-family: "Exo 2";
+            src: url("Exo2-VariableFont_wght.ttf");
+        }
+        html {
+            height: 100%;
+        }
+        body {
+            text-align: center;
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: "Exo 2";
+        }
+        h1 {
+            font-size: 72px;
+        }
+        p {
+            font-size: 24px;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            font-size: 24px;
+            text-decoration: none;
+            color: blue;
+        }
+
+        @keyframes pulse {
+            0% {
+                background-color: white;
+            }
+            50% {
+                background-color: blue;
+            }
+            100% {
+                background-color: white;
+            }
+        }
+
+        body {
+          animation-name: pulse;
+          animation-duration: 15s;
+          animation-iteration-count: infinite;
+      }
+    </style>
+</head>
+<body>
+    <h1 id="title" style="text-align:center;">Jsi gay?</h1>
+    <div id="buttons" style="display:flex; justify-content:center; gap:50px;">
+      <button id="noButton" onmouseover="moveButton()">NE</button>
+      <button id="yesButton" onclick="alert('Správně.')">ANO</button>
+    </div>
+
+    <script>
+      function moveButton() {
+          var x = Math.random() * (window.innerWidth - document.getElementById('noButton').offsetWidth);
+          var y = Math.random() * (window.innerHeight - document.getElementById('noButton').offsetHeight);
+          var noButton = document.getElementById('noButton');
+          noButton.style.position = 'absolute';
+          noButton.style.transition = "all 0.5s";
+          noButton.style.left = x + 'px';
+          noButton.style.top = y + 'px';
+      }
+
+      if (/Mobi|Android/i.test(navigator.userAgent)) {
+          document.getElementById('title').innerText = "Tato hra je aktuálně hratelná pouze na desktopových zařízeních. Přesuňte se na svůj počítač pro hraní této hry :).";
+          document.getElementById('title').style.fontSize = "36px";
+          document.getElementById('buttons').style.display = "none";
+      }
+    </script>
+
+    <a href="index.html" style="position:absolute; bottom:10px; right:10px;">Hlavní strana</a>
+</body>
+</html>
